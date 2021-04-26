@@ -68,7 +68,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_console(new Console),
     m_terminal(new Console),
     m_settings(new SettingsDialog),
-
 //! [1]
     m_serial(new QSerialPort(this)),
     m_chart(new Chart)
@@ -186,6 +185,7 @@ void MainWindow::readData()
 {
     const QByteArray data = m_serial->readAll();
     m_console->putData(data);
+    //m_chart->addData(data);
 }
 //! [7]
 
