@@ -41,6 +41,7 @@
     <addaction name="actionConfigure"/>
     <addaction name="actionClear"/>
     <addaction name="actionTerminal"/>
+    <addaction name="actionPlotter"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -191,6 +192,14 @@
    </property>
    <property name="shortcut">
     <string>Alt+T</string>
+   </property>
+  </action>
+  <action name="actionPlotter">
+   <property name="text">
+    <string>Plotter</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
    </property>
   </action>
  </widget>

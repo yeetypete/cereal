@@ -87,6 +87,7 @@ private slots:
     void writeData(const QByteArray &data);
     void readData();
     void showTerminal();
+    void showPlotter();
     void runCommand(QString command);
 
     void handleError(QSerialPort::SerialPortError error);
