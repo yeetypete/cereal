@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   QMainWindow window;
   Chart *chart = new Chart;
-  chart->setTitle("Cereal (SPECIFY PORT & INFO HERE)");
+  //chart->setTitle("Cereal (SPECIFY PORT & INFO HERE)");
   chart->legend()->show();
   chart->setAnimationOptions(QChart::NoAnimation);
   QChartView chartView(chart);

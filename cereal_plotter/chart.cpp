@@ -6,10 +6,11 @@
 #include <QtCharts/QSplineSeries>
 
 #include <QtCharts/QValueAxis>
-#include <QtCore/QRandomGenerator>
+//#include <QtCore/QRandomGenerator>
 #include <QtCore/QDebug>
 #include <QEasingCurve>
 #include <limits>
+#include <QtMath>
 
 Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   QChart(QChart::ChartTypeCartesian, parent, wFlags),
@@ -64,15 +65,15 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
 void Chart::generateSignal() {
   m_time_x += m_timer.interval();
   for (auto & SSignal : m_SerialSingals) {
-    qreal noise = QRandomGenerator::global()->bounded(10) - 5;
-    qreal rand_y = noise;
+    //qreal noise = QRandomGenerator::global()->bounded(10) - 5;
+    qreal rand_y = 0; //noise;
     if (fmod(m_time_x, 500) < 1) {
         rand_y = 100 * sin(m_time_x/5000);
     }
     SSignal.m_series->append(m_time_x, rand_y);
   }
   eraseNotDisplayed();
-  dynamicAxisX(100); // number of samples to display in time-series
+  dynamicAxisX(50); // number of samples to display in time-series
   autoScrollX(0.95); // percent of chart
   autoScaleY(0.95, false);
 }
@@ -129,22 +130,25 @@ void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
      view_maxY = qMax(qAbs(view_maxY), qAbs(view_minY));
      view_minY = - view_maxY;
   }
-
-  if (view_maxY > offset_pcnt * m_axisY->max()) {
-      m_axisY->setMax(view_maxY * (1/offset_pcnt));
-  }
-  else {
-      qreal rate = (m_axisY->max() * offset_pcnt - view_maxY) / m_axisY->max();
-      m_axisY->setMax(m_axisY->max() - rate);
-  }
   if (view_minY < offset_pcnt * m_axisY->min()) {
       m_axisY->setMin(view_minY * (1/offset_pcnt));
   }
   else {
-      qreal rate = (m_axisY->min() * offset_pcnt - view_minY) / m_axisY->min();
+      qreal rate = 0;
+      if (m_axisY->min() != 0)
+        rate = (m_axisY->min() * offset_pcnt - view_minY) / m_axisY->min();
       m_axisY->setMin(m_axisY->min() + rate);
   }
-  //m_axisY->applyNiceNumbers();
+  if (view_maxY > offset_pcnt * m_axisY->max()) {
+      m_axisY->setMax(view_maxY * (1/offset_pcnt));
+  }
+  else {
+      qreal rate = 0;
+      if (m_axisY->max() != 0)
+              rate = (m_axisY->max() * offset_pcnt - view_maxY) / m_axisY->max();
+      m_axisY->setMax(m_axisY->max() - rate);
+  }
+   //axisY->applyNiceNumbers();
   //m_axisY->setTickCount(5);
   //qDebug() << "max_y: " << view_maxY << m_axisY->max();
   //qDebug() << "min_y: " << view_minY << m_axisY->min();

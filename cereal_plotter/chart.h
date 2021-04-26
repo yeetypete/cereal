@@ -20,7 +20,9 @@ class SerialSignal {
   QPen m_pen;
   QLineSeries *m_series;
 };
+//![1]
 
+//![2]
 class Chart: public QChart {
   Q_OBJECT
  public:
@@ -48,6 +50,6 @@ class Chart: public QChart {
   qreal m_t_interval;
 };
 
-//![1]
+//![2]
 
 #endif /* CHART_H */
