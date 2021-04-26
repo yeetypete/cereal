@@ -155,7 +155,7 @@ void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
   //qDebug() << "min_y: " << view_minY << m_axisY->min();
 }
 
-void Chart::parseSerial() {
+void Chart::parseSerial(const QByteArray &data) {
 
 }
 

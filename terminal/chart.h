@@ -33,7 +33,7 @@ class Chart: public QChart {
  public:
   void autoScrollX(qreal);
   void autoScaleY(qreal, bool);
-  void parseSerial();
+  void parseSerial(const QByteArray &data);
   void eraseNotDisplayed();
   void dynamicAxisX(qreal);
   void indicatorAxisX();

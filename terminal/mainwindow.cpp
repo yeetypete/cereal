@@ -115,6 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_terminal, &Console::sendCommand, this, &MainWindow::runCommand);
     connect(this, &MainWindow::commandResponse, m_terminal, &Console::commandOutput);
 
+
 //! [3]
 }
 //! [3]
@@ -185,7 +186,7 @@ void MainWindow::readData()
 {
     const QByteArray data = m_serial->readAll();
     m_console->putData(data);
-    //m_chart->addData(data);
+    m_chart->parseSerial(data);
 }
 //! [7]
 
@@ -209,6 +210,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(m_ui->actionTerminal, &QAction::triggered, this, &MainWindow::showTerminal);
+    connect(m_ui->actionPlotter, &QAction::triggered, this, &MainWindow::showPlotter);
 
 }
 
@@ -220,6 +222,11 @@ void MainWindow::showStatusMessage(const QString &message)
 void MainWindow::showTerminal()
 {
     m_ui->dockWidget_2->show();
+}
+
+void MainWindow::showPlotter()
+{
+    m_ui->dockWidget->show();
 }
 
 void MainWindow::runCommand(QString command)
