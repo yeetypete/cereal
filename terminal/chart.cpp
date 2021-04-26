@@ -29,6 +29,7 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   m_axisY->setTickCount(5);
   m_axisX->setRange(0, 100);
   m_axisY->setRange(-10, 10);
+  m_axisX->setLabelsVisible(false);
 
   //Initialize Serial Signals
   for (int i = 0; i < 2; i++) {
