@@ -30,10 +30,11 @@ class Chart: public QChart {
   void generateSignal();
  public:
   void autoScrollX(qreal);
-  void autoScaleY(qreal);
+  void autoScaleY(qreal, bool);
   void parseSerial();
   void eraseNotDisplayed();
   void dynamicAxisX(qreal);
+  void indicatorAxisX();
 
  private:
   QVector<SerialSignal> m_SerialSingals;

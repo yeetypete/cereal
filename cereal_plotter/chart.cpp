@@ -26,8 +26,8 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
 
   m_axisX->setTickCount(10);
   m_axisY->setTickCount(5);
-  //m_axisX->setRange(0, 100);
- //m_axisY->setRange(-10, 10);
+  m_axisX->setRange(0, 100);
+  m_axisY->setRange(-10, 10);
 
   //Initialize Serial Signals
   for (int i = 0; i < 2; i++) {
@@ -74,7 +74,7 @@ void Chart::generateSignal() {
   eraseNotDisplayed();
   dynamicAxisX(100); // number of samples to display in time-series
   autoScrollX(0.95); // percent of chart
-  autoScaleY(0.95);
+  autoScaleY(0.95, false);
 }
 
 void Chart::autoScrollX(qreal offset_pcnt) {
@@ -105,7 +105,7 @@ void Chart::dynamicAxisX(qreal num_points) {
   }
 }
 
-void Chart::autoScaleY(qreal offset_pcnt) {
+void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
   // find max peaks in series
     qreal view_minY = 0;
     qreal view_maxY = 0;
@@ -125,6 +125,10 @@ void Chart::autoScaleY(qreal offset_pcnt) {
 
 //  QEasingCurve easingMaxY(QEasingCurve::InExpo);
 //  QEasingCurve easingMinY(QEasingCurve::InExpo);
+  if (symmetric) {
+     view_maxY = qMax(qAbs(view_maxY), qAbs(view_minY));
+     view_minY = - view_maxY;
+  }
 
   if (view_maxY > offset_pcnt * m_axisY->max()) {
       m_axisY->setMax(view_maxY * (1/offset_pcnt));
@@ -157,6 +161,10 @@ void Chart::eraseNotDisplayed() {
       //qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
     }
   }
+}
+
+void Chart::indicatorAxisX() {
+
 }
 
 
