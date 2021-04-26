@@ -53,10 +53,12 @@
 #include "ui_mainwindow.h"
 #include "console.h"
 #include "settingsdialog.h"
+#include "chart.h"
 
 #include <QLabel>
 #include <QMessageBox>
 #include <QDebug>
+#include <QtCharts/QChartView>
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
@@ -66,8 +68,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_console(new Console),
     m_terminal(new Console),
     m_settings(new SettingsDialog),
+
 //! [1]
-    m_serial(new QSerialPort(this))
+    m_serial(new QSerialPort(this)),
+    m_chart(new Chart)
+
 //! [1]
 {
 //! [0]
@@ -89,6 +94,15 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->actionConfigure->setEnabled(true);
 
     m_ui->statusBar->addWidget(m_status);
+
+    m_chart->legend()->show();
+    m_chart->setAnimationOptions(QChart::NoAnimation);
+    m_chart->resize(400,70);
+    QChartView *chartView = new QChartView(m_chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    m_ui->dockWidget->setWidget(chartView);
+    m_ui->dockWidget->show();
 
     initActionsConnections();
 

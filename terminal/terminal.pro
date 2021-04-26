@@ -1,4 +1,4 @@
-QT += widgets serialport
+QT += widgets serialport charts
 requires(qtConfig(combobox))
 
 TARGET = terminal
@@ -8,12 +8,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settingsdialog.cpp \
-    console.cpp
+    console.cpp \
+    chart.cpp
 
 HEADERS += \
     mainwindow.h \
     settingsdialog.h \
-    console.h
+    console.h \
+    chart.h
 
 FORMS += \
     mainwindow.ui \

@@ -66,6 +66,7 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class Console;
+class Chart;
 class SettingsDialog;
 
 class MainWindow : public QMainWindow
@@ -96,13 +97,13 @@ private:
 private:
     void showStatusMessage(const QString &message);
 
-
     Ui::MainWindow *m_ui = nullptr;
     QLabel *m_status = nullptr;
     Console *m_console = nullptr;
     Console *m_terminal = nullptr;
     SettingsDialog *m_settings = nullptr;
     QSerialPort *m_serial = nullptr;
+    Chart *m_chart = nullptr;
 };
 
 #endif // MAINWINDOW_H
