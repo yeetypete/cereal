@@ -19,7 +19,7 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   m_maxY(0),
   m_minY(0){
   QObject::connect(&m_timer, &QTimer::timeout, this, &Chart::generateSignal);
-  m_timer.setInterval(100);
+  m_timer.setInterval(50);
 
   addAxis(m_axisX, Qt::AlignBottom);
   addAxis(m_axisY, Qt::AlignLeft);
@@ -48,7 +48,7 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
     addSeries(SSignal->m_series);
     SSignal->m_series->attachAxis(m_axisX);
     SSignal->m_series->attachAxis(m_axisY);
-//    SSignal->m_series->setUseOpenGL(true);
+    SSignal->m_series->setUseOpenGL(true);
 
     m_SerialSingals.push_back(*SSignal);
   }
@@ -66,18 +66,15 @@ void Chart::generateSignal() {
   for (auto & SSignal : m_SerialSingals) {
     qreal noise = QRandomGenerator::global()->bounded(10) - 5;
     qreal rand_y = noise;
-    if (fmod(m_time_x, 1000) < 1) {
+    if (fmod(m_time_x, 500) < 1) {
         rand_y = 100 * sin(m_time_x/5000);
-    }
-    if (fmod(m_time_x, 1500) < 1) {
-        rand_y = 100 * sin( m_time_x/5000);
     }
     SSignal.m_series->append(m_time_x, rand_y);
   }
+  eraseNotDisplayed();
   dynamicAxisX(100); // number of samples to display in time-series
   autoScrollX(0.95); // percent of chart
-  eraseNotDisplayed();
-  autoScaleY(0.9);
+  autoScaleY(0.95);
 }
 
 void Chart::autoScrollX(qreal offset_pcnt) {
@@ -118,7 +115,7 @@ void Chart::autoScaleY(qreal offset_pcnt) {
     for (auto & p : SSignal.m_series->pointsVector()) {
       min_y = qMin(min_y, p.y());
       max_y = qMax(max_y, p.y());
-      qDebug() << "local mins/max: " << min_y << max_y;
+      //qDebug() << "local mins/max: " << min_y << max_y;
     }
     if (min_y < view_minY)
         view_minY = min_y;
@@ -126,27 +123,27 @@ void Chart::autoScaleY(qreal offset_pcnt) {
         view_maxY = max_y;
   }
 
-  QEasingCurve easingMaxY(QEasingCurve::InExpo);
-  QEasingCurve easingMinY(QEasingCurve::InExpo);
+//  QEasingCurve easingMaxY(QEasingCurve::InExpo);
+//  QEasingCurve easingMinY(QEasingCurve::InExpo);
 
   if (view_maxY > offset_pcnt * m_axisY->max()) {
-      m_axisY->setMax(view_maxY * (2 - offset_pcnt));
+      m_axisY->setMax(view_maxY * (1/offset_pcnt));
   }
   else {
-      qreal rate = (m_axisY->max() - view_maxY) / m_axisY->max();
+      qreal rate = (m_axisY->max() * offset_pcnt - view_maxY) / m_axisY->max();
       m_axisY->setMax(m_axisY->max() - rate);
   }
   if (view_minY < offset_pcnt * m_axisY->min()) {
-      m_axisY->setMin(view_minY * (2 - offset_pcnt));
+      m_axisY->setMin(view_minY * (1/offset_pcnt));
   }
   else {
-      qreal rate = (m_axisY->min() - view_minY) / m_axisY->min();
+      qreal rate = (m_axisY->min() * offset_pcnt - view_minY) / m_axisY->min();
       m_axisY->setMin(m_axisY->min() + rate);
   }
   //m_axisY->applyNiceNumbers();
   //m_axisY->setTickCount(5);
-  qDebug() << "max_y: " << view_maxY << m_axisY->max();
-  qDebug() << "min_y: " << view_minY << m_axisY->min();
+  //qDebug() << "max_y: " << view_maxY << m_axisY->max();
+  //qDebug() << "min_y: " << view_minY << m_axisY->min();
 }
 
 void Chart::parseSerial() {
