@@ -185,7 +185,7 @@ void MainWindow::writeData(const QByteArray &data)
 //! [7]
 void MainWindow::readData()
 {
-    const QByteArray data = m_serial->readAll();
+    const QByteArray data = m_serial->readLine();
     m_console->putData(data);
     m_chart->parseSerial(data);
 }

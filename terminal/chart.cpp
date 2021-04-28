@@ -1,93 +1,53 @@
 #include "chart.h"
 #include <QtCharts/QAbstractAxis>
-
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QScatterSeries>
-#include <QtCharts/QSplineSeries>
-
 #include <QtCharts/QValueAxis>
-//#include <QtCore/QRandomGenerator>
 #include <QtCore/QDebug>
 #include <QEasingCurve>
 #include <limits>
 #include <QtMath>
 #include <string>
 
+SerialSignal::SerialSignal() {
+    m_num_points = 0;
+}
+
 Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   QChart(QChart::ChartTypeCartesian, parent, wFlags),
   m_axisX(new QValueAxis()),
   m_axisY(new QValueAxis()),
-  m_maxY(0),
-  m_minY(0),
+  m_newlines(0),
   m_data_recieved(false),
   m_delimiters{"\t", ";", ",", " "}{
-//  QObject::connect(&m_timer, &QTimer::timeout, this, &Chart::generateSignal);
-//  m_timer.setInterval(50);
 
   addAxis(m_axisX, Qt::AlignBottom);
   addAxis(m_axisY, Qt::AlignLeft);
 
   m_axisX->setTickCount(10);
   m_axisY->setTickCount(5);
-  m_axisX->setRange(0, 100);
+  m_axisX->setRange(0, 5000);
   m_axisY->setRange(-10, 10);
-  m_axisX->setLabelsVisible(false);
-
-    // Initialize Serial Signals
-//  for (int i = 0; i < 2; i++) {
-//    SerialSignal *SSignal = new SerialSignal;
-//    SSignal->m_series = new QLineSeries;
-
-//    Set pen
-//    SSignal->m_pen.setColor(Qt::red);
-//    SSignal->m_pen.setWidth(3);
-//    SSignal->m_series->setPen(SSignal->m_pen);
-
-//    Set name for legend
-//    QString s_name = "Signal ";
-//    s_name += QString::number(i);
-//    SSignal->m_series->setName(s_name);
-
-//    //Attach axes
-//    addSeries(SSignal->m_series);
-//    SSignal->m_series->attachAxis(m_axisX);
-//    SSignal->m_series->attachAxis(m_axisY);
-//    SSignal->m_series->setUseOpenGL(true);
-
-//    m_SerialSingals.push_back(*SSignal);
-//  }
-
-//  m_timer.start();
-//  m_t_interval = m_timer.interval();
 
   legend()->setVisible(true);
   legend()->setAlignment(Qt::AlignTop);
   legend()->attachToChart();
 }
 
-//void Chart::generateSignal() {
-//  m_time_x += m_timer.interval();
-//  for (auto & SSignal : m_SerialSingals) {
-//    //qreal noise = QRandomGenerator::global()->bounded(10) - 5;
-//    qreal rand_y = 0; //noise;
-//    if (fmod(m_time_x, 500) < 1) {
-//        rand_y = 100 * sin(m_time_x/5000);
-//    }
-//    SSignal.m_series->append(m_time_x, rand_y);
-//  }
-//  eraseNotDisplayed();
-//  dynamicAxisX(50); // number of samples to display in time-series
-//  autoScrollX(0.95); // percent of chart
-//  autoScaleY(0.95, false);
-//}
-
 void Chart::autoScrollX(qreal offset_pcnt) {
   // convert between pixel and axis units
   qreal axis_x_width_dec = m_axisX->max() - m_axisX->min();
   qreal axis_x_width_pixels = plotArea().width();
 
-  qreal delta_x = axis_x_width_pixels / axis_x_width_dec * m_t_interval;
   qreal offset_x = axis_x_width_dec * offset_pcnt + m_axisX->min();
+  qreal max_x = 0;
+  for (auto & SSignal : m_SerialSingals) {
+      if (SSignal.m_series->pointsVector().isEmpty())
+          return;
+      if (SSignal.m_series->pointsVector().back().x() > max_x) {
+          max_x = SSignal.m_series->pointsVector().back().x();
+      }
+  }
+  qreal delta_x = axis_x_width_pixels / axis_x_width_dec * (max_x - offset_x);
   bool past_offset = false;
 
   for (auto & SSignal : m_SerialSingals) {
@@ -102,13 +62,6 @@ void Chart::autoScrollX(qreal offset_pcnt) {
   }
 }
 
-void Chart::dynamicAxisX(qreal num_points) {
-  if (m_t_interval != 0) {
-    m_axisX->setRange(m_axisX->min(),
-                      m_axisX->min() + num_points * m_t_interval);
-  }
-}
-
 void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
   // find max peaks in series
     qreal view_minY = 0;
@@ -119,7 +72,7 @@ void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
     for (auto & p : SSignal.m_series->pointsVector()) {
       min_y = qMin(min_y, p.y());
       max_y = qMax(max_y, p.y());
-      //qDebug() << "local mins/max: " << min_y << max_y;
+      //qDebug() << local mins/max: " << min_y << max_y;
     }
     if (min_y < view_minY)
         view_minY = min_y;
@@ -127,8 +80,6 @@ void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
         view_maxY = max_y;
   }
 
-//  QEasingCurve easingMaxY(QEasingCurve::InExpo);
-//  QEasingCurve easingMinY(QEasingCurve::InExpo);
   if (symmetric) {
      view_maxY = qMax(qAbs(view_maxY), qAbs(view_minY));
      view_minY = - view_maxY;
@@ -151,48 +102,89 @@ void Chart::autoScaleY(qreal offset_pcnt, bool symmetric) {
               rate = (m_axisY->max() * offset_pcnt - view_maxY) / m_axisY->max();
       m_axisY->setMax(m_axisY->max() - rate);
   }
-   //axisY->applyNiceNumbers();
-  //m_axisY->setTickCount(5);
-  //qDebug() << "max_y: " << view_maxY << m_axisY->max();
-  //qDebug() << "min_y: " << view_minY << m_axisY->min();
 }
 
-void Chart::parseSerial(const QByteArray &data) {
+
+void Chart::parseSerial(const QByteArray &byte_data) {
+    QString string_data = QString(byte_data.trimmed());
+    m_newlines ++;
+    plotSerialSignals(string_data);
+    autoScrollX(0.95);
+    autoScaleY(0.95, false);
+    eraseNotDisplayed();
+}
+
+void Chart::plotSerialSignals(QString data_string) {
+//    qDebug() << data_string;
+    if (!m_timeDomain) {
+        m_axisX->setRange(0, 100);
+    }
+
     QStringList contents;
-    QString data_string = QString::fromUtf8(data.toStdString().c_str());
+    bool has_delims = false;
     for (auto & delim : m_delimiters) {
         if (data_string.contains(delim)) {
             contents = data_string.split(delim);
-            break;
+            has_delims = true;
         }
     }
-    if (contents.size() == 0) {
+
+    if (!has_delims) {
+        contents.push_back(data_string);
+    }
+
+    if (contents.isEmpty()) {
         return;
     }
 
+    for (int i = 0; i < contents.size(); i++) {
+        if (contents.at(i).isEmpty())
+            contents.removeAt(i);
+    }
+
+//    qDebug() << contents;
+
     if (!m_data_recieved) {
         m_data_recieved = true;
-        m_timer.start();
+        m_timer_x.start();
 
         dynamicAddSeries(contents.size());
 
         for (int i = 0; i < contents.size(); i++) {
             qreal sig = contents.at(i).toDouble();
-            m_SerialSingals.at(i).m_series->append(sig, m_timer.elapsed());
+            if (m_timeDomain)
+                m_SerialSingals.at(i).m_series->append(m_timer_x.elapsed(), sig);
+            else {
+                //m_SerialSingals[i].m_num_points ++;
+                //m_SerialSingals.at(i).m_series->append(m_SerialSingals.at(i).m_num_points, sig);
+                m_SerialSingals.at(i).m_series->append(m_newlines, sig);
+            }
         }
     }
 
     else if (contents.size() <= m_SerialSingals.size()){
         for (int i = 0; i < contents.size(); i++) {
             qreal sig = contents.at(i).toDouble();
-            m_SerialSingals.at(i).m_series->append(sig, m_timer.elapsed());
+            if (m_timeDomain)
+                m_SerialSingals.at(i).m_series->append(m_timer_x.elapsed(), sig);
+            else {
+//                m_SerialSingals[i].m_num_points ++;
+//                m_SerialSingals.at(i).m_series->append(m_SerialSingals.at(i).m_num_points, sig);
+                  m_SerialSingals.at(i).m_series->append(m_newlines, sig);
+            }
         }
     }
     else {
         dynamicAddSeries(contents.size() - m_SerialSingals.size());
         for (int i = 0; i < contents.size(); i++)   {
             qreal sig = contents.at(i).toDouble();
-            m_SerialSingals.at(i).m_series->append(sig, m_timer.elapsed());
+            if (m_timeDomain)
+                m_SerialSingals.at(i).m_series->append(m_timer_x.elapsed(), sig);
+            else {
+//                m_SerialSingals[i].m_num_points ++;
+//                m_SerialSingals.at(i).m_series->append(m_SerialSingals.at(i).m_num_points, sig);
+                  m_SerialSingals.at(i).m_series->append(m_newlines, sig);
+            }
         }
     }
 }
@@ -206,6 +198,7 @@ void Chart::dynamicAddSeries(int numSeriesToAdd) {
         QString s_name = "Signal ";
         s_name += QString::number(i + numExisting);
         SSignal->m_series->setName(s_name);
+        addSeries(SSignal->m_series);
         SSignal->m_series->attachAxis(m_axisX);
         SSignal->m_series->attachAxis(m_axisY);
         SSignal->m_series->setUseOpenGL(true);
@@ -215,9 +208,11 @@ void Chart::dynamicAddSeries(int numSeriesToAdd) {
 
 void Chart::eraseNotDisplayed() {
   for (auto & SSignal : m_SerialSingals) {
+      if (SSignal.m_series->pointsVector().isEmpty())
+          return;
     if (SSignal.m_series->pointsVector().at(0).x() < m_axisX->min()) {
       SSignal.m_series->remove(0);
-      //qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
+//      qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
     }
   }
 }
