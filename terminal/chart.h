@@ -6,6 +6,9 @@
 #include <QVector>
 #include <QElapsedTimer>
 
+#define TDOMAIN_RANGE 5000
+#define SDOMAIN_RANGE 100
+
 QT_CHARTS_BEGIN_NAMESPACE
 class QLineSeries;
 class QValueAxis;
@@ -37,10 +40,20 @@ class Chart: public QChart {
   void plotSerialSignals(QString);
   void dynamicAddSeries(int);
   void autoScrollX(qreal);
-  void autoScaleY(qreal, bool);
+  void autoScaleY(qreal);
   void eraseNotDisplayed();
   void dynamicAxisX(qreal);
-  void indicatorAxisX();
+  void clearChart();
+  void setTimeDomain();
+  void setSampleDomain();
+  void setXRange(qreal);
+  void setYRange(qreal, qreal);
+
+ public:
+  bool m_timeDomain;
+  bool m_autoYScaling;
+  bool m_axisYSymmetric;
+  bool m_axisYSmooth;
 
  private:
   QVector<SerialSignal> m_SerialSingals;
@@ -49,7 +62,6 @@ class Chart: public QChart {
   QValueAxis *m_axisY;
   QVector<QPoint> m_points;
   qreal m_newlines;
-  bool m_timeDomain;
   bool m_data_recieved;
   QStringList m_delimiters;
 };
