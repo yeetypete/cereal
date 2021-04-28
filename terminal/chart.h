@@ -4,7 +4,7 @@
 #include <QtCharts/QChart>
 #include <QtCore/QTimer>
 #include <QVector>
-#include <QRegExp>
+#include <QElapsedTimer>
 
 QT_CHARTS_BEGIN_NAMESPACE
 class QLineSeries;
@@ -29,25 +29,28 @@ class Chart: public QChart {
   Chart(QGraphicsItem *parent = 0, Qt::WindowFlags wFlags = 0);
 
  public slots:
-  void generateSignal();
+//  void generateSignal();
+  void parseSerial(const QByteArray &data);
+
  public:
+  void dynamicAddSeries(int);
   void autoScrollX(qreal);
   void autoScaleY(qreal, bool);
-  void parseSerial(const QByteArray &data);
   void eraseNotDisplayed();
   void dynamicAxisX(qreal);
   void indicatorAxisX();
 
  private:
   QVector<SerialSignal> m_SerialSingals;
-  QTimer m_timer;
-  qreal m_time_x;
+  QElapsedTimer m_timer;
   QValueAxis *m_axisX;
   QValueAxis *m_axisY;
   qreal m_maxY;
   qreal m_minY;
   QVector<QPoint> m_points;
   qreal m_t_interval;
+  bool m_data_recieved;
+  QStringList m_delimiters;
 };
 
 //![2]
