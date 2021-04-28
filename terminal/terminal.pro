@@ -4,18 +4,18 @@ requires(qtConfig(combobox))
 TARGET = terminal
 TEMPLATE = app
 
+HEADERS += \
+    mainwindow.h \
+    settingsdialog.h \
+    console.h \
+    chart.h
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settingsdialog.cpp \
     console.cpp \
     chart.cpp
-
-HEADERS += \
-    mainwindow.h \
-    settingsdialog.h \
-    console.h \
-    chart.h
 
 FORMS += \
     mainwindow.ui \
