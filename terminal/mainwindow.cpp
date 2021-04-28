@@ -270,11 +270,12 @@ void MainWindow::runCommand(QString command)
         } else if (list1.at(0) == "save") {
             if (list1.at(1) != "") {
                 QFile file(list1.at(1));
-                if (file.open(QIODevice::ReadWrite)){
+                if (file.open(QIODevice::ReadWrite | QIODevice::Text)){
                     QTextStream stream(&file);
                     stream << m_console->toPlainText();
-                    file.flush();
+                    //file.flush();
                     file.close();
+                    emit commandResponse(tr("ct: successfully wrote to file: %1").arg(list1.at(1)));
                 } else {
                     response = "cterror: error saving to file";
                     emit commandResponse(response);
