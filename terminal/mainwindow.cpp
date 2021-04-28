@@ -307,28 +307,45 @@ void MainWindow::runCommand(QString command) {
             m_chart->m_axisYSymmetric = false;
             return;
         } else if (list1.at(1) == "smooth") {
-          m_chart->m_axisYSmooth = true;
-          m_chart->m_autoYScaling = true;
-          return;
-        } else if (list1.at(1) == "nsmooth") {
+            m_chart->m_axisYSmooth = true;
+            m_chart->m_autoYScaling = true;
+            m_chart->m_axisYSmooth_mult = DEFAULT_SMOOTH;
+      } else if (list1.at(1) == "nsmooth") {
             m_chart->m_axisYSmooth = false;
-            return;
+            //return;
         } else {
             emit commandResponse(tr("cterror: yrange does not take this argument."));
         }
-      }
-      if (list1.size() == 3) {
-        m_chart->m_autoYScaling = false;
-        qreal min = list1.at(1).toDouble();
-        qreal max = list1.at(2).toDouble();
-        m_chart->setYRange(min, max);
-      }
-      else {
-          response = tr("cterror: invalid command: %1").arg(list1.at(0));
-          emit commandResponse(response);
-          return;
-      }
-    } else {
+      } else if (list1.size() == 3) {
+          if (list1.at(1) == "smooth") {
+            m_chart->m_autoYScaling = true;
+            m_chart->m_axisYSmooth = true;
+            m_chart->m_axisYSmooth_mult = list1.at(2).toDouble();
+        }
+          else {
+             m_chart->m_autoYScaling = false;
+             qreal min = list1.at(1).toDouble();
+             qreal max = list1.at(2).toDouble();
+             m_chart->setYRange(min, max);
+             //return;
+           }
+        //qDebug() << m_chart->m_axisYSmooth_mult;
+        //return;
+        } else if (list1.size() > 3) {
+          emit commandResponse(tr("cterror: yrange cannot take more than 3 arguments."));
+        }
+      } else if (list1.at(0) == "rename") {
+        qDebug() << list1;
+          if (list1.size() == 3) {
+          bool result = m_chart->rename(list1.at(1), list1.at(2));
+          if (!result) {
+              emit commandResponse(tr("cterror: cannot rename signal."));
+              return;
+            }
+          else
+            return;
+          }
+      } else {
       response = tr("cterror: invalid command: %1").arg(list1.at(0));
       emit commandResponse(response);
     }
