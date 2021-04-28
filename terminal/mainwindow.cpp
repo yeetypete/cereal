@@ -59,6 +59,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QtCharts/QChartView>
+#include <QTextStream>
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
@@ -197,6 +198,7 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
         QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
         closeSerialPort();
     }
+
 }
 //! [8]
 
@@ -232,7 +234,55 @@ void MainWindow::showPlotter()
 void MainWindow::runCommand(QString command)
 {
     qDebug() << "recieved command: " << command << "\n";
-    QString response = "canned response";
-    emit commandResponse(response);
-
+    QString recievedCommand = command;
+    QString response;
+    QStringList list1 = recievedCommand.split(" ");
+    if (list1.length() > 0) {
+        if (list1.at(0) == "connect" || list1.at(0) == "c") {
+            if (!m_serial->isOpen()) {
+                openSerialPort();
+            } else {
+                response = "cterror: serial already connected";
+                emit commandResponse(response);
+            }
+        } else if (list1.at(0) == "disconnect" || list1.at(0) == "dc") {
+            if (m_serial->isOpen()) {
+                closeSerialPort();
+            } else {
+                response = "cterror: serial not connected";
+                emit commandResponse(response);
+            }
+        } else if (list1.at(0) == "baud") {
+            m_serial->setBaudRate(list1.at(1).toInt());
+            m_settings->setBaud(list1.at(1).toInt());
+            if (m_serial->isOpen()) {
+                const SettingsDialog::Settings p = m_settings->settings();
+                showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
+                                .arg(p.name).arg(list1.at(1)).arg(p.stringDataBits)
+                                .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
+            }
+        } else if (list1.at(0) == "clear") {
+            m_terminal->clear();
+        } else if (list1.at(0) == "port") {
+            m_serial->setPortName(list1.at(1));
+        } else if (list1.at(0) == "send") {
+            writeData(command.midRef(list1.at(0).length()).toLocal8Bit());
+        } else if (list1.at(0) == "save") {
+            if (list1.at(1) != "") {
+                QFile file(list1.at(1));
+                if (file.open(QIODevice::ReadWrite)){
+                    QTextStream stream(&file);
+                    stream << m_console->toPlainText();
+                    file.flush();
+                    file.close();
+                } else {
+                    response = "cterror: error saving to file";
+                    emit commandResponse(response);
+                }
+            }
+        } else {
+            response = tr("cterror: invalid command: %1").arg(list1.at(0));
+            emit commandResponse(response);
+        }
+    }
 }

@@ -119,7 +119,7 @@ void Console::keyPressEvent(QKeyEvent *e)
     {
         usr_input.remove("\r");
         emit sendCommand(usr_input);
-        emit getData(usr_input.toLocal8Bit());
+        //emit getData(usr_input.toLocal8Bit());
         qDebug() << "command entered: " << usr_input << "\n";
         usr_input.clear();
         textCursor().insertText("\ncereal > ");
@@ -137,8 +137,8 @@ void Console::keyPressEvent(QKeyEvent *e)
             cursor.setPosition(toPlainText().length(), QTextCursor::MoveAnchor);
             setTextCursor(cursor);
         }
-        if (m_localEchoEnabled)
-            QPlainTextEdit::keyPressEvent(e);
+
+        QPlainTextEdit::keyPressEvent(e);
         QString key = e->text();
         usr_input.append(key);
         //emit getData(e->text().toLocal8Bit());

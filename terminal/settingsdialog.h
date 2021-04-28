@@ -90,6 +90,7 @@ public:
     ~SettingsDialog();
 
     Settings settings() const;
+    void setBaud(int baud);
 
 private slots:
     void showPortInfo(int idx);
@@ -100,7 +101,7 @@ private slots:
 private:
     void fillPortsParameters();
     void fillPortsInfo();
-    void updateSettings();
+    void updateSettings();   
 
 private:
     Ui::SettingsDialog *m_ui = nullptr;

@@ -219,3 +219,9 @@ void SettingsDialog::updateSettings()
     m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
     m_currentSettings.autoscrollEnabled = m_ui->autoscrollCheckBox->isChecked();
 }
+
+void SettingsDialog::setBaud(int baud){
+    m_currentSettings.baudRate = baud;
+    m_currentSettings.stringBaudRate = QString::number(baud);
+    m_ui->baudRateBox->setCurrentIndex(4);
+}
