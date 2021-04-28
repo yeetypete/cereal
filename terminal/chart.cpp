@@ -234,13 +234,15 @@ void Chart::eraseNotDisplayed() {
       return;
     if (SSignal.m_series->pointsVector().at(0).x() < m_axisX->min()) {
       SSignal.m_series->remove(0);
-//      qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
+      qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
     }
   }
 }
 
 void Chart::clearChart() {
   m_SerialSingals.clear();
+  m_axisX->setRange(0,TDOMAIN_RANGE);
+  m_axisY->setRange(-DEFAULT_Y_RANGE, DEFAULT_Y_RANGE);
   removeAllSeries();
   m_data_recieved = false;
   m_timer_x.invalidate();

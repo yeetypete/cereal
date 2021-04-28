@@ -8,6 +8,7 @@
 
 #define TDOMAIN_RANGE 5000
 #define SDOMAIN_RANGE 100
+#define DEFAULT_Y_RANGE 10
 
 QT_CHARTS_BEGIN_NAMESPACE
 class QLineSeries;
