@@ -9,6 +9,9 @@
 #define TDOMAIN_RANGE 5000
 #define SDOMAIN_RANGE 100
 #define DEFAULT_Y_RANGE 10
+#define DEFAULT_SMOOTH 1
+#define DEFAULT_X_TICKS 5
+#define DEFAULT_Y_TICKS 5
 
 QT_CHARTS_BEGIN_NAMESPACE
 class QLineSeries;
@@ -49,12 +52,14 @@ class Chart: public QChart {
   void setSampleDomain();
   void setXRange(qreal);
   void setYRange(qreal, qreal);
+  bool rename(QString, QString);
 
  public:
   bool m_timeDomain;
   bool m_autoYScaling;
   bool m_axisYSymmetric;
   bool m_axisYSmooth;
+  qreal m_axisYSmooth_mult;
 
  private:
   QVector<SerialSignal> m_SerialSingals;

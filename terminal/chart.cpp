@@ -18,6 +18,7 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   m_autoYScaling(true),
   m_axisYSymmetric(false),
   m_axisYSmooth(false),
+  m_axisYSmooth_mult(DEFAULT_SMOOTH),
   m_axisX(new QValueAxis()),
   m_axisY(new QValueAxis()),
   m_newlines(0),
@@ -27,10 +28,10 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
   addAxis(m_axisX, Qt::AlignBottom);
   addAxis(m_axisY, Qt::AlignLeft);
 
-  m_axisX->setTickCount(10);
-  m_axisY->setTickCount(5);
-  m_axisX->setRange(0, 5000);
-  m_axisY->setRange(-10, 10);
+  m_axisX->setTickCount(DEFAULT_X_TICKS);
+  m_axisY->setTickCount(DEFAULT_Y_TICKS);
+  m_axisX->setRange(0, TDOMAIN_RANGE);
+  m_axisY->setRange(-DEFAULT_Y_RANGE, DEFAULT_Y_RANGE);
 
   legend()->setVisible(true);
   legend()->setAlignment(Qt::AlignTop);
@@ -105,14 +106,17 @@ void Chart::autoScaleY(qreal offset_pcnt) {
     }
   }
 
+  // smooth scaling
   else {
       if (view_minY < offset_pcnt * m_axisY->min()) {
             m_axisY->setMin(view_minY * (1/offset_pcnt));
         }
         else {
             qreal rate = 0;
-            if (m_axisY->min() != 0)
+            if (m_axisY->min() != 0) {
               rate = (m_axisY->min() * offset_pcnt - view_minY) / m_axisY->min();
+              rate *= m_axisYSmooth_mult;
+            }
             m_axisY->setMin(m_axisY->min() + rate);
         }
         if (view_maxY > offset_pcnt * m_axisY->max()) {
@@ -120,8 +124,10 @@ void Chart::autoScaleY(qreal offset_pcnt) {
         }
         else {
             qreal rate = 0;
-            if (m_axisY->max() != 0)
+            if (m_axisY->max() != 0) {
                     rate = (m_axisY->max() * offset_pcnt - view_maxY) / m_axisY->max();
+                    rate *= m_axisYSmooth_mult;
+            }
             m_axisY->setMax(m_axisY->max() - rate);
         }
   }
@@ -217,7 +223,7 @@ void Chart::dynamicAddSeries(int numSeriesToAdd) {
     SerialSignal *SSignal = new SerialSignal;
     SSignal->m_series = new QLineSeries;
 
-    QString s_name = "Signal ";
+    QString s_name = "signal_";
     s_name += QString::number(i + numExisting);
     SSignal->m_series->setName(s_name);
     addSeries(SSignal->m_series);
@@ -262,5 +268,53 @@ void Chart::setTimeDomain() {
 
 void Chart::setSampleDomain() {
 
+}
+
+bool Chart::rename(QString current_name, QString new_name) {
+    int matches_current = 0;
+    int match_index = 0;
+
+    // TODO: add support for whitespace in name
+    //qDebug() << "rename called";
+
+//    if (current_name.contains(" ")) {
+//            if (current_name.at(0) != "\"" && current_name.at(current_name.size() - 1) != "\"") {
+//                qDebug() << current_name;
+//                return false;
+//            }
+//            else {
+//                current_name.remove(0,1);
+//                current_name.remove(current_name.size() - 1, 1);
+//            }
+//    }
+
+
+//    if (new_name.contains(" ")) {
+//            if (new_name.at(0) != "\"" && new_name.at(new_name.size() - 1) != "\"") {
+//                return false;
+//                qDebug() << new_name;
+//            }
+//            else {
+//                new_name.remove(0,1);
+//                new_name.remove(new_name.size() - 1, 1);
+//            }
+//    }
+
+    for (int i = 0; i < m_SerialSingals.size(); i++) {
+        if (m_SerialSingals.at(i).m_series->name().contains(current_name)) {
+            matches_current ++;
+            match_index = i;
+        }
+        if (m_SerialSingals.at(i).m_series->name() == new_name) {
+            return false;
+        }
+    }
+    if (matches_current == 1) {
+        m_SerialSingals.at(match_index).m_series->setName(new_name);
+        legend()->update();
+        return true;
+    }
+    else
+        return false;
 }
 
