@@ -234,7 +234,7 @@ void Chart::eraseNotDisplayed() {
       return;
     if (SSignal.m_series->pointsVector().at(0).x() < m_axisX->min()) {
       SSignal.m_series->remove(0);
-      qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
+      //qDebug() << "series size: " << SSignal.m_series->pointsVector().size();
     }
   }
 }

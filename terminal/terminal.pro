@@ -1,7 +1,7 @@
 QT += widgets serialport charts
 requires(qtConfig(combobox))
 
-TARGET = terminal
+TARGET = cereal
 TEMPLATE = app
 
 HEADERS += \
