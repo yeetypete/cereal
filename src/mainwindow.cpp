@@ -168,7 +168,6 @@ void MainWindow::showPlotter() {
 }
 
 void MainWindow::runCommand(QString command) {
-  qDebug() << "recieved command: " << command << "\n";
   QString recievedCommand = command;
   QString response;
   QStringList list1 = recievedCommand.split(" ");
