@@ -1,7 +1,7 @@
 # Cereal, the real-time serial data visualization utility
 
 ## To launch the precompiled `cereal` binary:
-1. Enter `cereal` in the commadn line in the project directory containing `cereal`. Alternatively you can add `cereal` to `$PATH` to allow it to be launched from any directory. 
+1. Enter `cereal` in the commad line in the project directory containing `cereal`. Alternatively you can add `cereal` to `$PATH` to allow it to be launched from any directory. 
 
 ## To build your own version of `cereal`:
 
