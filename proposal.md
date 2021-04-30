@@ -1,7 +1,7 @@
 # Project Proposal: Cereal, the real-time serial data visualization utility
 
 ## Project Outline:
-It is common for Arduino and other embedded systems projects to send collected runtime data to a computer over a serial communication link. Because the collected data is often based on a live event, it is useful to be able to visualize the seraial data in real-time. Currently the most common way of visualizing real-time serial data is by displaying incoming data as newline separated strings printed to the terminal. We propose to expand on this functionality by creating Cereal, a real-time plotting utility for serial data.
+It is common for Arduino and other embedded systems projects to send collected runtime data to a computer over a serial communication link. Because the collected data is often based on a live event, it is useful to be able to visualize the serial data in real-time. Currently the most common way of visualizing real-time serial data is by displaying incoming data as newline separated strings printed to the terminal. We propose to expand on this functionality by creating Cereal, a real-time plotting utility for serial data.
 
 Cereal will be launched from the command line by typing `cereal` along with any additional arguments, including the serial port, baud rate, delimiter character, etc. A new window will be launched next to the terminal displaying a live plot of the incoming data. Axis data assignments can be specified from the terminal window and the axes will automatically shrink and expand to match the data bounds.
 
