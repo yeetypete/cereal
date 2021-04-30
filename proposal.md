@@ -10,7 +10,7 @@ While the plot is running in a new window, all interactivity with the plot will 
 The C++ QT5 cross platform application framework, specifically QT Charts will be used to create the plotting portion of Cereal. If necessary, the ncurses C library will be used to allow for non-blocking printing to the terminal window. 
 
 ## Team Roles:
-We have discussed our project with Prof. Carutthers and have been given permission to work on this project as a team of two. The distribution of tasks are as follows:
+We have discussed our project with Prof. Carruthers and have been given permission to work on this project as a team of two. The distribution of tasks are as follows:
 
 Dylan:
 1. The command line portion of Cereal, including optional arguments.
