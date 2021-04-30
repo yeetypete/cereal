@@ -13,4 +13,4 @@
 
 ## How to use `cereal`
 
-Please refer to the GitHub wiki found [here](https://github.com/yeetypete/cereal/wiki) for information on how to use `cereal`.
+Please refer to the GitHub wiki found [here](https://github.com/yeetypete/cereal/wiki) for information on how to use `cereal`. An example of a serial signal is provided for you in the cereal_generator directory. It can be compiled using the Arduino IDE.
